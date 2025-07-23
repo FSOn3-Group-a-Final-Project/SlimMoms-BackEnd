@@ -1,0 +1,18 @@
+type: object
+required:
+  - name
+  - email
+  - password
+properties:
+  userName:
+    type: string
+    description: Unique username for the user.
+    example: johndoe
+  email:
+    type: string
+    description: Email address of the user.
+    example: john@doe.com
+  password:
+    type: string
+    description: Password for the user account.
+    example: securepassword123
