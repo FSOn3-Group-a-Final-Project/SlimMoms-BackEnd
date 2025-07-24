@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { env } from './utils/env.js';
 import calcRoutes from './routers/calcRoutes.js';
+import router from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import productsRoutes from './routers/product.js';
@@ -24,7 +25,9 @@ export const startServer = () => {
     res.json({
       message: 'Welcome to the Slim Moms',
     });
-  });
+
+    
+  app.use(router);
 
   app.use(notFoundHandler);
 
