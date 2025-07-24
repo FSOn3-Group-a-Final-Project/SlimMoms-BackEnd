@@ -2,7 +2,7 @@ import { registerUser, loginUser, refreshUser, getUserByEmail } from '../service
 import createHttpError from 'http-errors';
 import { ONE_DAY } from '../constants/index.js';
 import jwt from 'jsonwebtoken';
-import { SessionsCollection } from '../db/models/session.js';
+import { SessionCollection } from '../db/models/session.js';
 
 export const registerUserController = async (req, res, next) => {
   try {
@@ -25,7 +25,7 @@ export const registerUserController = async (req, res, next) => {
       expiresIn: '10d',
     });
 
-    res.json({
+    res.status(201).json({
       status: 201,
       message: 'Successfully registered a user!',
       data: { id: _id, name: userName, email: userEmail, createdAt, updatedAt },
@@ -37,7 +37,7 @@ export const registerUserController = async (req, res, next) => {
 };
 
 export const loginUserController = async (req, res) => {
-    const session = await loginUser(req.body);
+  const { session, user } = await loginUser(req.body);
 
     res.cookie('refreshToken', session.refreshToken, {
         httpOnly: true,
@@ -51,7 +51,11 @@ export const loginUserController = async (req, res) => {
         status: 200,
         message: 'Successfully logged in an user!',
         data: {
-            accessToken: session.accessToken,
+          accessToken: session.accessToken,
+          user: {
+            name: user.name,
+            email: user.email
+          }
         },
     });
 };
@@ -97,22 +101,22 @@ export const logoutUserController = async (req, res, next) => {
     let session = null;
 
     if (accessToken) {
-      session = await SessionsCollection.findOne({ accessToken });
+      session = await SessionCollection.findOne({ accessToken });
     }
 
     if (!session && refreshToken) {
-      session = await SessionsCollection.findOne({ refreshToken });
+      session = await SessionCollection.findOne({ refreshToken });
     }
 
     if (!session && sessionId) {
-      session = await SessionsCollection.findById(sessionId);
+      session = await SessionCollection.findById(sessionId);
     }
 
     if (!session) {
       return res.status(404).json({ message: 'Session not found' });
     }
 
-    await SessionsCollection.findByIdAndDelete(session._id);
+    await SessionCollection.findByIdAndDelete(session._id);
 
     res.clearCookie('sessionId');
     res.clearCookie('refreshToken');

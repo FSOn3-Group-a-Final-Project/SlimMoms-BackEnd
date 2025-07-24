@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { env } from './utils/env.js';
 import calcRoutes from './routers/calcRoutes.js';
+import router from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import productsRoutes from './routers/product.js';
@@ -20,17 +21,20 @@ export const startServer = () => {
   app.use('/api', calcRoutes); // hesapalama routu
   app.use('/api/products', productsRoutes); // arama routu'u
 
-  app.get('/', (req, res) => {
+  app.get('/'), (req, res) => {
     res.json({
       message: 'Welcome to the Slim Moms',
     });
-  });
 
-  app.use(notFoundHandler);
+    
+    app.use(router);
 
-  app.use(errorHandler);
+    app.use(notFoundHandler);
 
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+    app.use(errorHandler);
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  };
 };
