@@ -8,8 +8,8 @@ import {
 
 const router = express.Router();
 
-router.post('/:date/products', authenticate, addProductToDiary);
-router.delete('/:date/products/:productId', authenticate, removeProductFromDiary);
-router.get('/:date', authenticate, getDiaryByDate);
+router.post('/', authenticate, addProductToDiary);
+router.delete('/:productId', authenticate, removeProductFromDiary);
+router.get("/", authenticate, getDiaryByDate);
 
 export default router;
