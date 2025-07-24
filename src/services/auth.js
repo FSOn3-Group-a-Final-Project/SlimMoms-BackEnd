@@ -3,7 +3,7 @@ import createHttpError from 'http-errors';
 import { UsersCollection } from '../db/models/user.js';
 import { randomBytes } from 'crypto';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/index.js';
-import { SessionCollection } from '../db/models/session.js';
+import { SessionsCollection } from '../db/models/session.js';
 
 export const registerUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
@@ -28,12 +28,12 @@ export const loginUser = async (payload) => {
     throw createHttpError(401, 'Unauthorized');
   }
 
-  await SessionCollection.deleteOne({ userId: user._id });
+  await SessionsCollection.deleteOne({ userId: user._id });
 
   const accessToken = randomBytes(30).toString('base64');
   const refreshToken = randomBytes(30).toString('base64');
 
-  const session = await SessionCollection.create({
+  const session = await SessionsCollection.create({
     userId: user._id,
     accessToken,
     refreshToken,
@@ -45,7 +45,7 @@ export const loginUser = async (payload) => {
 };
 
 export const logoutUser = async (sessionId) => {
-  await SessionCollection.deleteOne({ _id: sessionId });
+  await SessionsCollection.deleteOne({ _id: sessionId });
 };
 const createSession = () => {
   const accessToken = randomBytes(30).toString('base64');
@@ -60,7 +60,7 @@ const createSession = () => {
 };
 
 export const refreshUser = async ({ sessionId, refreshToken }) => {
-    const session = await SessionCollection.findOne({
+    const session = await SessionsCollection.findOne({
         _id: sessionId,
         refreshToken,
     });
@@ -78,9 +78,9 @@ export const refreshUser = async ({ sessionId, refreshToken }) => {
 
     const newSession = createSession();
 
-    await SessionCollection.deleteOne({ _id: sessionId, refreshToken });
+    await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
 
-    return await SessionCollection.create({
+    return await SessionsCollection.create({
         userId: session.userId,
         ...newSession,
     });

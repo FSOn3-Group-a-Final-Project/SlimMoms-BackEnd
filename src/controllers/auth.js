@@ -2,7 +2,7 @@ import { registerUser, loginUser, refreshUser, getUserByEmail } from '../service
 import createHttpError from 'http-errors';
 import { ONE_DAY } from '../constants/index.js';
 import jwt from 'jsonwebtoken';
-import { SessionCollection } from '../db/models/session.js';
+import { SessionsCollection } from '../db/models/session.js';
 
 export const registerUserController = async (req, res, next) => {
   try {
@@ -101,22 +101,22 @@ export const logoutUserController = async (req, res, next) => {
     let session = null;
 
     if (accessToken) {
-      session = await SessionCollection.findOne({ accessToken });
+      session = await SessionsCollection.findOne({ accessToken });
     }
 
     if (!session && refreshToken) {
-      session = await SessionCollection.findOne({ refreshToken });
+      session = await SessionsCollection.findOne({ refreshToken });
     }
 
     if (!session && sessionId) {
-      session = await SessionCollection.findById(sessionId);
+      session = await SessionsCollection.findById(sessionId);
     }
 
     if (!session) {
       return res.status(404).json({ message: 'Session not found' });
     }
 
-    await SessionCollection.findByIdAndDelete(session._id);
+    await SessionsCollection.findByIdAndDelete(session._id);
 
     res.clearCookie('sessionId');
     res.clearCookie('refreshToken');
