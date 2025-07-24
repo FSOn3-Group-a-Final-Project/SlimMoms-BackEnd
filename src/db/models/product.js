@@ -8,6 +8,6 @@ const productSchema = new mongoose.Schema({
   groupBloodNotAllowed: { type: [Boolean], required: true }
 });
 
-const Product = mongoose.model('Product', productSchema);
+const Product = mongoose.model('Product', productSchema, 'allProducts');
 
 export default Product;
