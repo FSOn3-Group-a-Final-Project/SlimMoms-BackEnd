@@ -1,48 +1,37 @@
-tags:
-  - Auth
-summary: Login user
-operationId: loginUser
-description: Authenticate a user with the provided credentials.
-requestBody:
-  required: true
-  content:
-    application/json:
-      schema:
-        type: object
-        required:
-          - email
-          - password
-        properties:
-          password:
-            type: string
-            description: Password for the user account.
-            example: 'P@ssw0rd!'
-          email:
-            type: string
-            description: Email address of the user.
-            example: 'john@doe.com'
-responses: 
-  '201':
-    description: Successfully login the user.
+post:
+  tags:
+    - Auth
+  summary: Login a user
+  description: Authenticates a user and returns access and refresh tokens.
+  operationId: loginUser
+  requestBody:
+    required: true
     content:
       application/json:
         schema:
-          type: object
-          required:
-            - status
-            - message
-            - data
-          properties:
-            status:
-              type: integer
-              example: 201
-            message:
-              type: string
-              example: User login successfully!
-            data:
-              type: object
-              properties:
-                userId:
-                  type: string
-                  description: Unique identifier for the user.
-                  example: '12345er456y54ded4...'
+          $ref: '../../../components/schemas/auth.yaml'
+  responses:
+    '200':
+      description: Successfully login the user.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+              - data
+            properties:
+              status:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: User login successfully!
+              data:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                    description: Unique identifier for the user.
+                    example: '12345er456y54ded4...'

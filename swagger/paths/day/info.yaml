@@ -1,0 +1,36 @@
+get:
+  tags:
+    - Day
+  summary: Get information for a specific day
+  description: Retrieves all information for a specific day from the database.
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: date
+      in: query
+      description: The date for which to retrieve information (e.g., YYYY-MM-DD).
+      required: true
+      schema:
+        type: string
+        format: date
+  responses:
+    '200':
+      description: Successfully retrieved day information.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              products:
+                type: array
+                items:
+                  $ref: '../../components/schemas/product.yaml'
+    '400':
+      description: Bad request.
+    '401':
+      $ref: '../../components/responses/401.yaml'
+    '404':
+      $ref: '../../components/responses/404.yaml'

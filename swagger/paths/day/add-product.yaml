@@ -1,0 +1,30 @@
+post:
+  tags:
+    - Day
+  summary: Add a product to a specific day
+  description: Adds a product that was eaten on a specific day to the database.
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date
+            productId:
+              type: string
+            weight:
+              type: number
+  responses:
+    '200':
+      description: Product added successfully.
+    '400':
+      description: Bad request.
+    '401':
+      $ref: '../../components/responses/401.yaml'
+    '404':
+      $ref: '../../components/responses/404.yaml'

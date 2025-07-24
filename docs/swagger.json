@@ -1,0 +1,657 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Slim Moms",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "description": "This is a documentation of Slim Moms app\n"
+  },
+  "servers": [
+    {
+      "url": "<http://localhost:3000>"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Auth operations."
+    },
+    {
+      "name": "Calories",
+      "description": "Calories calculation operations."
+    },
+    {
+      "name": "Day",
+      "description": "Day-related operations."
+    },
+    {
+      "name": "Products",
+      "description": "Product search operations."
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
+        "description": "Creates a new user account.",
+        "operationId": "registerUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/auth"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully registered the user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User registered successfully!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "description": "Unique identifier for the newly registered user.",
+                          "example": "12345er456y54"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login a user",
+        "description": "Authenticates a user and returns access and refresh tokens.",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/auth"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully login the user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User login successfully!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "description": "Unique identifier for the user.",
+                          "example": "12345er456y54ded4..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout a user",
+        "description": "Invalidates the user's current session and tokens.",
+        "operationId": "logoutUser",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged out the user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User logged out successfully!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calories/public": {
+      "post": {
+        "tags": [
+          "Calories"
+        ],
+        "summary": "Calculate daily calorie intake (public)",
+        "description": "Calculates the daily calorie intake for a user without authentication and provides a list of recommended products.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "height": {
+                    "type": "number"
+                  },
+                  "age": {
+                    "type": "number"
+                  },
+                  "currentWeight": {
+                    "type": "number"
+                  },
+                  "desiredWeight": {
+                    "type": "number"
+                  },
+                  "bloodType": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully calculated daily calorie intake.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dailyRate": {
+                      "type": "number"
+                    },
+                    "notAllowedProducts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request."
+          }
+        }
+      }
+    },
+    "/calories/private": {
+      "post": {
+        "tags": [
+          "Calories"
+        ],
+        "summary": "Calculate daily calorie intake (private)",
+        "description": "Calculates the daily calorie intake for an authenticated user, saves the data, and provides a list of recommended products.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "height": {
+                    "type": "number"
+                  },
+                  "age": {
+                    "type": "number"
+                  },
+                  "currentWeight": {
+                    "type": "number"
+                  },
+                  "desiredWeight": {
+                    "type": "number"
+                  },
+                  "bloodType": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully calculated and saved daily calorie intake.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dailyRate": {
+                      "type": "number"
+                    },
+                    "notAllowedProducts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request."
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          }
+        }
+      }
+    },
+    "/day/add-product": {
+      "post": {
+        "tags": [
+          "Day"
+        ],
+        "summary": "Add a product to a specific day",
+        "description": "Adds a product that was eaten on a specific day to the database.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "productId": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product added successfully."
+          },
+          "400": {
+            "description": "Bad request."
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/day/delete-product": {
+      "delete": {
+        "tags": [
+          "Day"
+        ],
+        "summary": "Delete a product from a specific day",
+        "description": "Deletes a product that was eaten on a specific day from the database.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "productId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product deleted successfully."
+          },
+          "400": {
+            "description": "Bad request."
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/day/info": {
+      "get": {
+        "tags": [
+          "Day"
+        ],
+        "summary": "Get information for a specific day",
+        "description": "Retrieves all information for a specific day from the database.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "The date for which to retrieve information (e.g., YYYY-MM-DD).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved day information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/product"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request."
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/products/search": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Search for products",
+        "description": "Searches for products in the database based on a query string.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The search query for products.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of products that match the search query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/product"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "auth": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "userName": {
+            "type": "string",
+            "description": "Unique username for the user.",
+            "example": "johndoe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the user.",
+            "example": "john@doe.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the user account.",
+            "example": "securepassword123"
+          }
+        }
+      },
+      "product": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "calories": {
+            "type": "number"
+          },
+          "groupBloodNotAllowed": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "401": {
+        "description": "Unauthorized error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "data"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "UnauthorizedError"
+                },
+                "data": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Access token expired"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "NotFound error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "data"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 404
+                },
+                "message": {
+                  "type": "string",
+                  "example": "NotFoundError"
+                },
+                "data": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Product not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

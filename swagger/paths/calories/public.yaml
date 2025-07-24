@@ -1,0 +1,38 @@
+post:
+  tags:
+    - Calories
+  summary: Calculate daily calorie intake (public)
+  description: Calculates the daily calorie intake for a user without authentication and provides a list of recommended products.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            height:
+              type: number
+            age:
+              type: number
+            currentWeight:
+              type: number
+            desiredWeight:
+              type: number
+            bloodType:
+              type: number
+  responses:
+    '200':
+      description: Successfully calculated daily calorie intake.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              dailyRate:
+                type: number
+              notAllowedProducts:
+                type: array
+                items:
+                  type: string
+    '400':
+      description: Bad request.

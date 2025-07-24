@@ -1,0 +1,28 @@
+delete:
+  tags:
+    - Day
+  summary: Delete a product from a specific day
+  description: Deletes a product that was eaten on a specific day from the database.
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date
+            productId:
+              type: string
+  responses:
+    '200':
+      description: Product deleted successfully.
+    '400':
+      description: Bad request.
+    '401':
+      $ref: '../../components/responses/401.yaml'
+    '404':
+      $ref: '../../components/responses/404.yaml'

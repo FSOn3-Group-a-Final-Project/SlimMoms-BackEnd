@@ -1,0 +1,42 @@
+post:
+  tags:
+    - Calories
+  summary: Calculate daily calorie intake (private)
+  description: Calculates the daily calorie intake for an authenticated user, saves the data, and provides a list of recommended products.
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            height:
+              type: number
+            age:
+              type: number
+            currentWeight:
+              type: number
+            desiredWeight:
+              type: number
+            bloodType:
+              type: number
+  responses:
+    '200':
+      description: Successfully calculated and saved daily calorie intake.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              dailyRate:
+                type: number
+              notAllowedProducts:
+                type: array
+                items:
+                  type: string
+    '400':
+      description: Bad request.
+    '401':
+      $ref: '../../components/responses/401.yaml'

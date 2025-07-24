@@ -1,0 +1,12 @@
+type: object
+properties:
+  _id:
+    type: string
+  title:
+    type: string
+  calories:
+    type: number
+  groupBloodNotAllowed:
+    type: array
+    items:
+      type: boolean

@@ -4,31 +4,41 @@ info:
   title: Slim Moms
   license:
     name: Apache 2.0
-    url: <http://www.apache.org/licenses/LICENSE-2.0.html>
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   description: >
     This is a documentation of Slim Moms app
 tags:
-  - name: Products
-    description: Products.
   - name: Auth
     description: Auth operations.
+  - name: Calories
+    description: Calories calculation operations.
+  - name: Day
+    description: Day-related operations.
+  - name: Products
+    description: Product search operations.
 servers:
   - url: <http://localhost:3000>
   # - url: live link eklenecek
 paths:
   # /products: eklenecek
   /auth/register:
-    post:
-     $ref: ../swagger/paths/auth/register/post.yaml
+    $ref: '../swagger/paths/auth/register/post.yaml'
   /auth/login:
-    post:
-     $ref: ../swagger/paths/auth/login/post.yaml
+    $ref: '../swagger/paths/auth/login/post.yaml'
   /auth/logout:
-    post:
-     $ref: ../swagger/paths/auth/logout/post.yaml
-  /auth/refresh-token:
-    post:
-     $ref: ../swagger/paths/auth/refreshToken/post.yaml
+    $ref: '../swagger/paths/auth/logout/post.yaml'
+  /calories/public:
+    $ref: '../swagger/paths/calories/public.yaml'
+  /calories/private:
+    $ref: '../swagger/paths/calories/private.yaml'
+  /day/add-product:
+    $ref: '../swagger/paths/day/add-product.yaml'
+  /day/delete-product:
+    $ref: '../swagger/paths/day/delete-product.yaml'
+  /day/info:
+    $ref: '../swagger/paths/day/info.yaml'
+  /products/search:
+    $ref: '../swagger/paths/products/search.yaml'
 components:
   securitySchemes:
     bearerAuth:
