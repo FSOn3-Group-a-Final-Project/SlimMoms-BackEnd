@@ -1,8 +1,6 @@
-import { registerUser, loginUser, refreshUser, getUserByEmail } from '../services/auth.js';
+import { registerUser, loginUser, logoutUser, refreshUser, getUserByEmail } from '../services/auth.js';
 import createHttpError from 'http-errors';
 import { ONE_DAY } from '../constants/index.js';
-import jwt from 'jsonwebtoken';
-import { SessionCollection } from '../db/models/session.js';
 
 export const registerUserController = async (req, res, next) => {
   try {
@@ -21,15 +19,12 @@ export const registerUserController = async (req, res, next) => {
 
     const { _id, name: userName, email: userEmail, createdAt, updatedAt } = userObj;
 
-    const token = jwt.sign({ id: _id }, process.env.JWT_SECRET, {
-      expiresIn: '10d',
-    });
 
     res.status(201).json({
       status: 201,
       message: 'Successfully registered a user!',
       data: { id: _id, name: userName, email: userEmail, createdAt, updatedAt },
-      token,
+
     });
   } catch (error) {
     next(createHttpError(500, error));
@@ -88,41 +83,13 @@ export const refreshUserController = async (req, res) => {
   });
 };
 
-export const logoutUserController = async (req, res, next) => {
-  try {
-    const accessToken = req.get('Authorization')?.split(' ')[1];
-    const refreshToken = req.cookies.refreshToken;
-    const sessionId = req.cookies.sessionId;
-
-    if (!accessToken && !refreshToken && !sessionId) {
-      return res.status(401).json({ message: 'Authorization error: No tokens provided' });
-    }
-
-    let session = null;
-
-    if (accessToken) {
-      session = await SessionCollection.findOne({ accessToken });
-    }
-
-    if (!session && refreshToken) {
-      session = await SessionCollection.findOne({ refreshToken });
-    }
-
-    if (!session && sessionId) {
-      session = await SessionCollection.findById(sessionId);
-    }
-
-    if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
-    }
-
-    await SessionCollection.findByIdAndDelete(session._id);
-
-    res.clearCookie('sessionId');
-    res.clearCookie('refreshToken');
-
-    res.status(200).json({ message: 'Successfully logged out!' });
-  } catch (error) {
-    next(createHttpError(500, error));
+export const logoutUserController = async (req, res) => {
+  if (req.cookies.sessionId) {
+    await logoutUser(req.cookies.sessionId);
   }
+
+  res.clearCookie('sessionId');
+  res.clearCookie('refreshToken');
+
+  res.status(204).send();
 };
