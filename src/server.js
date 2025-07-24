@@ -19,7 +19,7 @@ export const startServer = () => {
   );
   app.use(cors());
   app.use('/api', calcRoutes); // hesapalama routu
-  app.use('/api/products', productsRoutes); // arama routu'u
+ // app.use('/api/products', productsRoutes); // arama routu'u
 
   app.get('/'), (req, res) => {
     res.json({
