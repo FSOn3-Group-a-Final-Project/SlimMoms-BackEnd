@@ -4,4 +4,5 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 const router = Router();
 router.get('/', ctrlWrapper(getAllProductsController));
+
 export default router;
