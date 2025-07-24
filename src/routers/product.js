@@ -1,11 +1,11 @@
 import express from 'express';
-import {getFilteredProducts} from '../controllers/product.js';
-import { authenticate } from '../middlewares/authenticate.js';
 import {
+  getFilteredProducts,
   addProductToDiary,
   removeProductFromDiary,
   getDiaryByDate,
-} from '../controllers/diary.js';
+} from '../controllers/product.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
@@ -14,5 +14,5 @@ router.get('/', getFilteredProducts);
 
 router.post('/', authenticate, addProductToDiary);
 router.delete('/:productId', authenticate, removeProductFromDiary);
-router.get("/", authenticate, getDiaryByDate);
+router.get('/', authenticate, getDiaryByDate);
 export default router;
