@@ -11,4 +11,4 @@ const sessionSchema = new Schema(
   { timestamps: true, versionKey: false },
 );
 
-export const SessionsCollection = model('sessions', sessionSchema);
+export const SessionCollection = model('sessions', sessionSchema);
