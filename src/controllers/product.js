@@ -44,7 +44,7 @@ export const addProductToDiary = async (req, res) => {
     }
 
     await diary.save();
-    res.status(200).json({message: "Ürün başarı ile eklendi"},diary);
+    res.status(200).json({message: "Ürün başarı ile eklendi",diary} );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Sunucu hatası' });
