@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from './utils/env.js';
-import calcRoutes from './routers/calcRoutes.js';
+
 import router from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -22,16 +22,12 @@ export const startServer = () => {
 
   app.use(cors());
 
-  app.use('/api', calcRoutes);
-  // app.use('/api/products', productsRoutes);
-
+  app.use(router);
   app.get('/', (req, res) => {
     res.json({
       message: 'Welcome to the Slim Moms',
     });
   });
-
-  app.use(router);
 
   app.use(notFoundHandler);
 
@@ -41,4 +37,3 @@ export const startServer = () => {
     console.log(`Server is running on port ${PORT}`);
   });
 };
-
