@@ -1,0 +1,23 @@
+tags:
+  - Product
+summary: 'Search and filter products'
+description: 'Returns a list of products. Can be filtered by a search query.'
+operationId: getFilteredProducts
+parameters:
+  - name: search
+    in: query
+    description: 'Filter products by title'
+    required: false
+    schema:
+      type: string
+responses:
+  '200':
+    description: 'A list of products.'
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../components/schemas/product.yaml'
+  '500':
+    description: 'Internal Server Error.'

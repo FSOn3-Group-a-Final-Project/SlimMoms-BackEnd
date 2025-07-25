@@ -1,0 +1,30 @@
+type: object
+properties:
+  _id:
+    type: string
+    description: "The unique identifier for the diary entry."
+    example: "60c72b2f9b1d8c001f8e4c8b"
+  user:
+    type: string
+    description: "The ID of the user who owns the diary entry."
+    example: "60c72b2f9b1d8c001f8e4c8a"
+  date:
+    type: string
+    format: date
+    description: "The date of the diary entry."
+    example: "2024-07-28"
+  products:
+    type: array
+    items:
+      type: object
+      properties:
+        product:
+          $ref: './product.yaml'
+        weight:
+          type: number
+          description: "Weight of the product consumed in grams."
+          example: 150
+required:
+  - user
+  - date
+  - products

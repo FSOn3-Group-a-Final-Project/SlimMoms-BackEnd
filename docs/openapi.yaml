@@ -8,28 +8,495 @@ info:
   description: >
     This is a documentation of Slim Moms app
 tags:
-  - name: Products
-    description: Products.
   - name: Auth
     description: Auth operations.
+  - name: Product
+    description: Product operations.
+  - name: Diary
+    description: Diary operations.
 servers:
-  - url: <http://localhost:3000>
-  # - url: live link eklenecek
+  - url: http://localhost:3000
 paths:
-  # /products: eklenecek
+  /products:
+    get:
+      tags:
+        - Product
+      summary: 'Search and filter products'
+      description: 'Returns a list of products. Can be filtered by a search query.'
+      operationId: getFilteredProducts
+      parameters:
+        - name: search
+          in: query
+          description: 'Filter products by title'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'A list of products.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: 'Internal Server Error.'
+    post:
+      tags:
+        - Diary
+      summary: 'Add a product to the diary for a specific date'
+      description: 'Adds a product to the user''s diary for a given date. Requires authentication.'
+      operationId: addProductToDiary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - date
+                - weight
+              properties:
+                productId:
+                  type: string
+                  description: 'The ID of the product to add.'
+                  example: '5d51694902b2373622ff5b7f'
+                date:
+                  type: string
+                  format: date
+                  description: 'The date for the diary entry (YYYY-MM-DD).'
+                  example: '2024-07-28'
+                weight:
+                  type: number
+                  description: 'The weight of the product consumed, in grams.'
+                  example: 150
+      responses:
+        '200':
+          description: 'Product added successfully to the diary.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Ürün başarı ile eklendi"
+                  addedProduct:
+                    type: object
+                    properties:
+                      details:
+                        $ref: '#/components/schemas/Product'
+                      weight:
+                        type: number
+                        example: 150
+        '400':
+          description: 'Invalid input, for example, an invalid product ID.'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: 'Product not found.'
+        '500':
+          description: 'Internal Server Error.'
+  /products/diary/{date}/{productId}:
+    delete:
+      tags:
+        - Diary
+      summary: 'Remove a product from the diary'
+      description: 'Removes a specific product from the user''s diary for a given date. Requires authentication.'
+      operationId: removeProductFromDiary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: 'The date of the diary entry to remove the product from (YYYY-MM-DD).'
+          schema:
+            type: string
+            format: date
+            example: '2024-07-28'
+        - name: productId
+          in: path
+          required: true
+          description: 'The ID of the product to remove from the diary.'
+          schema:
+            type: string
+            example: '5d51694902b2373622ff5b7f'
+      responses:
+        '200':
+          description: 'Product removed successfully from the diary.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Ürün silindi'
+                  deletedProduct:
+                    $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: 'Diary entry or product not found.'
+        '500':
+          description: 'Internal Server Error.'
+  /products/diary/{date}:
+    get:
+      tags:
+        - Diary
+      summary: 'Get diary entries for a specific date'
+      description: 'Retrieves all diary entries for a user on a specific date. Requires authentication.'
+      operationId: getDiaryByDate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: 'The date to retrieve diary entries for (YYYY-MM-DD).'
+          schema:
+            type: string
+            format: date
+            example: '2024-07-28'
+      responses:
+        '200':
+          description: 'Diary entries for the specified date.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryEntry'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: 'No diary entry found for this date.'
+        '500':
+          description: 'Internal Server Error.'
+  /products/diary:
+    get:
+      tags:
+        - Diary
+      summary: 'Get all products from all diary entries'
+      description: 'Retrieves a flat list of all products ever added to the diary by the user. Requires authentication.'
+      operationId: getAllDiaryProducts
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 'A list of all diary product entries.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    _id:
+                      type: string
+                    product:
+                      $ref: '#/components/schemas/Product'
+                    weight:
+                      type: number
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          description: 'Internal Server Error.'
   /auth/register:
     post:
-     $ref: ../swagger/paths/auth/register/post.yaml
+      tags:
+        - Auth
+      summary: Register a new user
+      operationId: registerUser
+      description: Register a new user with the provided details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth'
+      responses:
+        '201':
+          description: Successfully registered the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - message
+                  - data
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: User registered successfully!
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        description: Unique identifier for the newly registered user.
+                        example: '12345er456y54'
   /auth/login:
     post:
-     $ref: ../swagger/paths/auth/login/post.yaml
+      tags:
+        - Auth
+      summary: Login user
+      operationId: loginUser
+      description: Authenticate a user with the provided credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                password:
+                  type: string
+                  description: Password for the user account.
+                  example: 'P@ssw0rd!'
+                email:
+                  type: string
+                  description: Email address of the user.
+                  example: 'john@doe.com'
+      responses:
+        '201':
+          description: Successfully login the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - message
+                  - data
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: User login successfully!
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        description: Unique identifier for the user.
+                        example: '12345er456y54ded4...'
   /auth/logout:
     post:
-     $ref: ../swagger/paths/auth/logout/post.yaml
+      tags:
+        - Auth
+      summary: Logout user
+      operationId: logoutUser
+      description: Logout the user by invalidating the current session or token.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - message
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: User logged out successfully!
   /auth/refresh-token:
     post:
-     $ref: ../swagger/paths/auth/refreshToken/post.yaml
+      tags:
+        - Auth
+      summary: refresh user token
+      operationId: refreshToken
+      description: Refresh the user's authentication token using the provided refresh token.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: The refresh token to be used for generating a new access token.
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+      responses:
+        '200':
+          description: Successfully refreshed the token.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - message
+                  - data
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Token refreshed successfully!
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        description: The new access token.
+                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+        '400':
+          description: Bad request, invalid refresh token.
 components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '5d51694902b2373622ff5b7f'
+        categories:
+          type: string
+          example: 'grain'
+        weight:
+          type: number
+          example: 100
+        title:
+          type: string
+          example: 'Pirinç'
+        calories:
+          type: number
+          example: 360
+        groupBloodNotAllowed:
+          type: array
+          items:
+            type: boolean
+          example: [false, true, false, true]
+    DiaryEntry:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: "The unique identifier for the diary entry."
+          example: "60c72b2f9b1d8c001f8e4c8b"
+        user:
+          type: string
+          description: "The ID of the user who owns the diary entry."
+          example: "60c72b2f9b1d8c001f8e4c8a"
+        date:
+          type: string
+          format: date
+          description: "The date of the diary entry."
+          example: "2024-07-28"
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                $ref: '#/components/schemas/Product'
+              weight:
+                type: number
+                description: "Weight of the product consumed in grams."
+                example: 150
+      required:
+        - user
+        - date
+        - products
+    Auth:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: Unique username for the user.
+          example: johndoe
+        email:
+          type: string
+          description: Email address of the user.
+          example: john@doe.com
+        password:
+          type: string
+          description: Password for the user account.
+          example: securepassword123
+  responses:
+    '401':
+      description: Unauthorized error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+              - data
+            properties:
+              status:
+                type: integer
+                example: 401
+              message:
+                type: string
+                example: UnauthorizedError
+              data:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: 'Access token expired'
+    '404':
+      description: NotFound error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+              - data
+            properties:
+              status:
+                type: integer
+                example: 404
+              message:
+                type: string
+                example: 'NotFoundError'
+              data:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: 'Product not found'
   securitySchemes:
     bearerAuth:
       type: http

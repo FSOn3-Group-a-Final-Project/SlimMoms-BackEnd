@@ -1,0 +1,29 @@
+tags:
+  - Diary
+summary: 'Get diary entries for a specific date'
+description: 'Retrieves all diary entries for a user on a specific date. Requires authentication.'
+operationId: getDiaryByDate
+security:
+  - bearerAuth: []
+parameters:
+  - name: date
+    in: path
+    required: true
+    description: 'The date to retrieve diary entries for (YYYY-MM-DD).'
+    schema:
+      type: string
+      format: date
+      example: '2024-07-28'
+responses:
+  '200':
+    description: 'Diary entries for the specified date.'
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/diaryEntry.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
+  '404':
+    description: 'No diary entry found for this date.'
+  '500':
+    description: 'Internal Server Error.'
