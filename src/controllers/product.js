@@ -5,7 +5,7 @@ import DiaryEntry from '../db/models/diaryEntry.js';
 
 
 
-// TEST ÜRÜNÜ EKLEME - BİR KERELİK 
+// TEST ÜRÜNÜ EKLEME - BİR KERELİK
 
 
 const insertTestProductIfEmpty = async () => {
@@ -23,7 +23,7 @@ const insertTestProductIfEmpty = async () => {
     console.log("🟡 'Pirinç' ürünü zaten mevcut:", existing._id.toString());
   }
 };
-// TEST ÜRÜNÜ EKLEME - BİR KERELİK 
+// TEST ÜRÜNÜ EKLEME - BİR KERELİK
 
 
 
@@ -35,7 +35,7 @@ export const getFilteredProducts = async (req,res) => {
         const {search} = req.query;
         let products;
         if(search){
-            //search paramateresi varsa title a göre filtrele (case-insensitive) RegExp,  metin arama ve eşleştirme işlemleri yapmak için 
+            //search paramateresi varsa title a göre filtrele (case-insensitive) RegExp,  metin arama ve eşleştirme işlemleri yapmak için
             const regex = new RegExp(search,'i'); // i -> case insensitive (küçük-büyük harf farkı olmadan arama yapılması için)
             products = await Product.find({title:{$regex:regex}});
         }else {
@@ -89,7 +89,16 @@ try {
     }
 
     await diary.save();
-    res.status(200).json({message: "Ürün başarı ile eklendi",diary} );
+
+    const addedProductDetails = await Product.findById(productId);
+
+    res.status(200).json({
+        message: "Ürün başarı ile eklendi",
+        addedProduct: {
+          details: addedProductDetails,
+          weight: weight
+        }
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Sunucu hatası' });
@@ -106,13 +115,23 @@ export const removeProductFromDiary = async (req, res) => {
       return res.status(404).json({ message: 'Günlük kaydı bulunamadı' });
     }
 
-    // ürün listeden siliniyor
+    const productToDelete = diary.products.find(
+      (item) => item.product.toString() === productId,
+    );
+
+    if (!productToDelete) {
+      return res.status(404).json({ message: 'Günlükte bu ürün bulunamadı' });
+    }
+
+    const deletedProductDetails = await Product.findById(productToDelete.product);
+
     diary.products = diary.products.filter(
       (item) => item.product.toString() !== productId,
     );
 
     await diary.save();
-    res.status(200).json({ message: 'Ürün silindi', diary });
+
+    res.status(200).json({ message: 'Ürün silindi', deletedProduct: deletedProductDetails });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Sunucu hatası' });
@@ -133,6 +152,29 @@ export const getDiaryByDate = async (req, res) => {
     }
 
     res.status(200).json(diary);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+};
+
+export const getAllDiaryProducts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const diaries = await DiaryEntry.find({ user: userId }).populate('products.product');
+
+    if (!diaries || diaries.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const allProducts = diaries.flatMap(diary =>
+      diary.products.map(entry => ({
+        date: diary.date,
+        ...entry.toObject(),
+      }))
+    );
+
+    res.status(200).json(allProducts);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Sunucu hatası' });

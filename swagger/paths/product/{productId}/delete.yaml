@@ -1,0 +1,34 @@
+tags:
+  - Diary
+summary: 'Remove a product from the diary'
+description: 'Removes a specific product from the user''s diary for a given date. Requires authentication.'
+operationId: removeProductFromDiary
+security:
+  - bearerAuth: []
+parameters:
+  - name: productId
+    in: path
+    required: true
+    description: 'The ID of the product to remove from the diary.'
+    schema:
+      type: string
+      example: '5d51694902b2373622ff5b7f'
+responses:
+  '200':
+    description: 'Product removed successfully from the diary.'
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: 'Ürün silindi'
+            diary:
+              $ref: '../../components/schemas/diaryEntry.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
+  '404':
+    description: 'Diary entry or product not found.'
+  '500':
+    description: 'Internal Server Error.'

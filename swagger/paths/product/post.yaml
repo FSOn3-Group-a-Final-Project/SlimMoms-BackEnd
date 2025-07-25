@@ -1,0 +1,52 @@
+tags:
+  - Diary
+summary: 'Add a product to the diary for a specific date'
+description: 'Adds a product to the user''s diary for a given date. Requires authentication.'
+operationId: addProductToDiary
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - productId
+          - date
+          - weight
+        properties:
+          productId:
+            type: string
+            description: 'The ID of the product to add.'
+            example: '5d51694902b2373622ff5b7f'
+          date:
+            type: string
+            format: date
+            description: 'The date for the diary entry (YYYY-MM-DD).'
+            example: '2024-07-28'
+          weight:
+            type: number
+            description: 'The weight of the product consumed, in grams.'
+            example: 150
+responses:
+  '200':
+    description: 'Product added successfully to the diary.'
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Ürün başarı ile eklendi"
+            diary:
+              $ref: '../components/schemas/diaryEntry.yaml'
+  '400':
+    description: 'Invalid input, for example, an invalid product ID.'
+  '401':
+    $ref: '../responses/401.yaml'
+  '404':
+    description: 'Product not found.'
+  '500':
+    description: 'Internal Server Error.'
