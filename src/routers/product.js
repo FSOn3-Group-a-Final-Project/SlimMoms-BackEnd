@@ -14,5 +14,5 @@ router.get('/', getFilteredProducts);
 
 router.post('/', authenticate, addProductToDiary);
 router.delete('/:productId', authenticate, removeProductFromDiary);
-router.get('/', authenticate, getDiaryByDate);
+router.get('/diary/:date', authenticate, getDiaryByDate); // router.get('/', authenticate, getDiaryByDate);
 export default router;

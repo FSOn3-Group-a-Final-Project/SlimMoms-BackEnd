@@ -2,6 +2,34 @@ import Product from "../db/models/product.js";
 import DiaryEntry from '../db/models/diaryEntry.js';
 
 
+
+
+
+// TEST ÜRÜNÜ EKLEME - BİR KERELİK 
+
+
+const insertTestProductIfEmpty = async () => {
+  const existing = await Product.findOne({ title: "Pirinç" });
+  if (!existing) {
+    const created = await Product.create({
+      categories: 'grain',
+      weight: 100,
+      title: 'Pirinç',
+      calories: 360,
+      groupBloodNotAllowed: [false, true, false, true],
+    });
+    console.log("🟢 Test ürünü oluşturuldu:", created._id.toString());
+  } else {
+    console.log("🟡 'Pirinç' ürünü zaten mevcut:", existing._id.toString());
+  }
+};
+// TEST ÜRÜNÜ EKLEME - BİR KERELİK 
+
+
+
+
+
+
 export const getFilteredProducts = async (req,res) => {
     try {
         const {search} = req.query;
@@ -25,11 +53,28 @@ export const getFilteredProducts = async (req,res) => {
 
 export const addProductToDiary = async (req, res) => {
   try {
+
+
+     // ⬇GEÇİCİ: test ürünü ekleme (sadece ilk çalıştırmada)
+    await insertTestProductIfEmpty();
+
+
     const userId = req.user.id;
     const { productId, date, weight } = req.body;
 
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ message: 'Ürün bulunamadı!' });
+    //test için
+    let product;
+try {
+  product = await Product.findById(productId);
+  if (!product) return res.status(404).json({ message: 'Ürün bulunamadı!' });
+} catch (err) {
+  return res.status(400).json({ message: 'Geçersiz ürün ID' });
+}
+// test biten kod
+
+
+    // const product = await Product.findById(productId);
+    // if (!product) return res.status(404).json({ message: 'Ürün bulunamadı!' });
 
     let diary = await DiaryEntry.findOne({ user: userId, date });
 
