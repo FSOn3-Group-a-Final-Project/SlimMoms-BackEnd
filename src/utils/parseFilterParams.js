@@ -3,7 +3,7 @@ const parseBloodType = (bloodType) => {
   if (!isString) return;
 
   const isBloodType = (bloodType) =>
-    ['1', '2', '3', '4'].includes(bloodType);
+    ['A', 'B', 'AB', '0'].includes(bloodType);
 
   if (isBloodType(bloodType)) return bloodType;
 };
