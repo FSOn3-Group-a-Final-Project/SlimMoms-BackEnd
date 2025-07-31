@@ -49,7 +49,8 @@ export const loginUserController = async (req, res) => {
           accessToken: session.accessToken,
           user: {
             name: user.name,
-            email: user.email
+            email: user.email,
+             bloodType: user.bloodType, // kan grubu için
           }
         },
     });
