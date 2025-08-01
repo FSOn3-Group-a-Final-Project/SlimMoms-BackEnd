@@ -60,30 +60,34 @@ const createSession = () => {
 };
 
 export const refreshUser = async ({ sessionId, refreshToken }) => {
-    const session = await SessionCollection.findOne({
-        _id: sessionId,
-        refreshToken,
-    });
+  const session = await SessionCollection.findOne({
+    _id: sessionId,
+    refreshToken,
+  });
 
-    if (!session) {
-        throw createHttpError(401, 'Session not found');
-    }
+  if (!session) {
+    throw createHttpError(401, 'Session not found');
+  }
 
-    const isSessionTokenExpired =
-        new Date() > new Date(session.refreshTokenValidUntil);
+  const isSessionTokenExpired =
+    new Date() > new Date(session.refreshTokenValidUntil);
 
-    if (isSessionTokenExpired) {
-        throw createHttpError(401, 'Session token expired');
-    }
+  if (isSessionTokenExpired) {
+    throw createHttpError(401, 'Session token expired');
+  }
 
-    const newSession = createSession();
+  const newSessionData = createSession();
 
-    await SessionCollection.deleteOne({ _id: sessionId, refreshToken });
+  await SessionCollection.deleteOne({ _id: sessionId, refreshToken });
 
-    return await SessionCollection.create({
-        userId: session.userId,
-        ...newSession,
-    });
+  const newSession = await SessionCollection.create({
+    userId: session.userId,
+    ...newSessionData,
+  });
+
+  const user = await UsersCollection.findById(session.userId); // <= eksikti
+
+  return { session: newSession, user };
 };
 
 export const getUserByEmail = async (email) => {
